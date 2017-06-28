@@ -37,7 +37,7 @@ def pages(soup):
 def pages_van(soup):
     num = soup.find('li',attrs={'class':'paginationMini__count'})
     num = num.text
-    num = re.sub('Page 1 of ','',num)
+    num = re.sub('Page [0-9]+ of ','',num)
     length = []
     for i in range(int(num)):
         length.append(i+1)
@@ -52,9 +52,9 @@ class data_extract():
         driver.get(url)
         soup = BeautifulSoup(driver.page_source)
         self.length = pages(soup)
-        try:
-            results = soup.findAll('div', attrs={'class': 'searchResult '})
-            for a, b in enumerate(results):
+        results = soup.findAll('div', attrs={'class': 'searchResult '})
+        for a, b in enumerate(results):
+            try:
                 soup = b
                 header = soup.find('h2')
                 title = header.text.replace('\n', ' ').replace('\r', '')
@@ -83,8 +83,9 @@ class data_extract():
                 c.execute("INSERT INTO motordata VALUES (?,?,?,?,?,?,?,?)",
                           (date, link, title, age, attributes, miles, price, brand))
                 conn.commit()
-        except Exception as e:
-            print(e)
+            except Exception as e:
+                print(e)
+
 
     def get_length_motor(self):
         return self.length
@@ -96,49 +97,53 @@ class data_extract():
         results = soup.findAll('li', attrs={'class': 'search-page__result'})
         print(len(results))
         for a, b in enumerate(results):
-            soup = b
-            header = soup.find('h2')
-            title = header.text.replace('\n', ' ').replace('\r', '')
-            # If the search result is an add then
             try:
-                link = soup.find('a', attrs={'class': 'listing-fpa-link'})
-                link = link['href']
-                link = re.sub('\?.*', '', str(link))
-            except:
-                continue
-
-            try:
-                attributes = soup.find('ul', attrs={'class': 'listing-key-specs '})
-                attributes = attributes.text.replace('\n', ' ').replace('\r', '')
-            except:
-                attributes = soup.find('ul', attrs={'class': 'listing-key-specs write-off-cat'})
-                attributes = attributes.text.replace('\n', ' ').replace('\r', '')
-
-            price = soup.find('div', attrs={'class': 'vehicle-price'})
-            price = price.text.replace('\n', ' ').replace('\r', '').replace('\t', '')
-
-            try:
-                miles = re.search('[0-9,]+ miles', attributes).group()
-                miles = re.sub(r' miles', '', miles).replace(' ', '').replace('\t', '')
-            except:
-                miles = None
-
-            try:
-                age = re.sub(r' \(.*', '', attributes).replace(' ', '').replace('\t', '')
-            except:
-                age = None
-
-            for brand in van_brands:
+                soup = b
+                header = soup.find('h2')
+                title = header.text.replace('\n', ' ').replace('\r', '')
+                # If the search result is an add then
                 try:
-                    if re.search(brand.lower(), title.lower()).group() != None:
-                        brand = brand
-                        break
+                    link = soup.find('a', attrs={'class': 'listing-fpa-link'})
+                    link = link['href']
+                    link = re.sub('\?.*', '', str(link))
                 except:
                     continue
 
-            c.execute("INSERT INTO vandata VALUES (?,?,?,?,?,?,?,?)",
-                      (date, link, title, age, attributes, miles, price, brand))
-            conn.commit()
+                try:
+                    attributes = soup.find('ul', attrs={'class': 'listing-key-specs '})
+                    attributes = attributes.text.replace('\n', ' ').replace('\r', '')
+                except:
+                    attributes = soup.find('ul', attrs={'class': 'listing-key-specs write-off-cat'})
+                    attributes = attributes.text.replace('\n', ' ').replace('\r', '')
+
+                price = soup.find('div', attrs={'class': 'vehicle-price'})
+                price = price.text.replace('\n', ' ').replace('\r', '').replace('\t', '')
+
+                try:
+                    miles = re.search('[0-9,]+ miles', attributes).group()
+                    miles = re.sub(r' miles', '', miles).replace(' ', '').replace('\t', '')
+                except:
+                    miles = None
+
+                try:
+                    age = re.sub(r' \(.*', '', attributes).replace(' ', '').replace('\t', '')
+                except:
+                    age = None
+
+                for brand in van_brands:
+                    try:
+                        if re.search(brand.lower(), title.lower()).group() != None:
+                            brand = brand
+                            break
+                    except:
+                        continue
+
+                c.execute("INSERT INTO vandata VALUES (?,?,?,?,?,?,?,?)",
+                          (date, link, title, age, attributes, miles, price, brand))
+                conn.commit()
+
+            except Exception as e:
+                print(e)
 
     def get_length_van(self):
         return self.length_van
