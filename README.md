@@ -1,6 +1,6 @@
 # Autotrader-Van-Motorhome-Scraper
 
-I needed to scrape some data in order to inform myself on what statistically is a good deal when coming to buy a van and the resale value I can expect once the project is over.
+I needed to scrape some data in order to inform myself on what statistically is a good deal when it comes to buying a van. Equally understanding the resale value I can expect once the project is over.
 
 # Autotrader Selenium Scraper
 
