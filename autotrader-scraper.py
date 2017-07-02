@@ -6,7 +6,7 @@ from selenium import webdriver
 import re
 
 url = 'http://motorhomes.autotrader.co.uk/search?locationName=LONDON&latitude=51.4879990129&longitude=-0.1405074285&postcode=SW1V%204DA'
-url = 'http://www.autotrader.co.uk/van-search?sort=sponsored-supplied&radius=1500&postcode=sw1v4da&body-type=Panel%20Van&wheelbase=LWB'
+# url = 'http://www.autotrader.co.uk/van-search?sort=sponsored-supplied&radius=1500&postcode=sw1v4da&body-type=Panel%20Van&wheelbase=LWB'
 
 conn = sql.connect(r'Vans2.db')
 c = conn.cursor()
@@ -74,7 +74,7 @@ class data_extract():
 
                 for brand in brands:
                     try:
-                        if re.search(brand, title).group() != None:
+                        if re.search(brand.lower(), title.lower()).group() != None:
                             brand = brand
                             break
                     except:
